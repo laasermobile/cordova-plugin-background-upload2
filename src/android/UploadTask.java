@@ -334,8 +334,23 @@ public final class UploadTask extends Worker {
             // https://stackoverflow.com/questions/44667125/getmimetypefromextension-returns-null-when-i-pass-json-as-extension
             mediaType = MediaType.parse(MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension) + "; charset=utf-8");
         } else {
-            mediaType = MediaType.parse(MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension));
+                try
+                {
+                   String mtype= MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+                    if(mtype != null)
+                        mediaType = MediaType.parse(mtype);
+                    else
+                        mediaType = MediaType.parse("application/octet-stream");
+  //                mediaType = MediaType.parse(MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension));
+                   Log.e(TAG, "media: " + mediaType.toString()+" / "+mtype);
+                 }
+                catch (Exception e)
+                {
+                    Log.e(TAG,"Exception", e);
+                    mediaType = MediaType.parse("application/octet-stream");
+                }
         }
+        
         File file = new File(filepath);
         ProgressRequestBody fileRequestBody = new ProgressRequestBody(mediaType, file.length(), new FileInputStream(file), this::handleProgress);
 
